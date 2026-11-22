@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lumina — Фотостудия</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;800&family=Cormorant+Garamond:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
+<style>
+@property --r{syntax:'<length>';inherits:false;initial-value:0px}
+:root{box-sizing:border-box;color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--k:#000;--w:#fff;--g:#c9c9c9;--d:'Unbounded','Arial Black',Arial,sans-serif;--s:'Cormorant Garamond',Georgia,serif}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+*,*::before,*::after{box-sizing:inherit;margin:0}
+body{background:var(--w);color:var(--k);font:500 clamp(1.25rem,2.4vw,1.55rem)/1.4 var(--s);overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1240px;margin:0 auto;padding:0 clamp(1.2rem,4vw,3rem)}
+
+/* iris intro */
+.iris{position:fixed;inset:0;z-index:50;pointer-events:none;background:radial-gradient(circle at 50% 50%,transparent var(--r),#000 calc(var(--r) + 2px));animation:open 1.7s .25s cubic-bezier(.75,0,.2,1) forwards}
+@keyframes open{to{--r:150vmax}}
+.lens{position:fixed;left:0;top:0;width:76px;height:76px;margin:-38px 0 0 -38px;border-radius:50%;background:#fff;mix-blend-mode:difference;pointer-events:none;z-index:60;display:none;opacity:0;scale:var(--s,1);transition:scale .35s cubic-bezier(.2,.7,.2,1)}
+@media(pointer:fine){.lens{display:block}}
+
+/* split text */
+[data-split]{font-family:var(--d);font-weight:800;letter-spacing:-.045em;line-height:1}
+.w{display:inline-block;white-space:nowrap}
+.c{display:inline-block;opacity:0;filter:blur(16px);transform:translateY(55%) rotate(4deg);animation:in 1s cubic-bezier(.2,.7,.2,1) both;animation-delay:var(--d);animation-play-state:paused}
+.go .c{animation-play-state:running}
+@keyframes in{to{opacity:1;filter:blur(0);transform:none}}
+
+/* nav + hero */
+nav{display:flex;justify-content:space-between;align-items:center;padding:1.6rem 0}
+.logo{font:800 1.3rem var(--d);letter-spacing:-.05em}
+nav ul{display:flex;gap:2.2rem;list-style:none}
+nav ul a{background:linear-gradient(currentColor,currentColor) 0 100%/0 1px no-repeat;transition:background-size .4s}
+nav ul a:hover{background-size:100% 1px}
+.pill{display:inline-block;font:500 .78rem var(--d);padding:1em 1.8em;border:1.5px solid var(--k);border-radius:99px;background:linear-gradient(var(--k),var(--k)) 0 100%/100% 0 no-repeat;transition:background-size .45s cubic-bezier(.2,.7,.2,1),color .45s}
+.pill:hover{background-size:100% 100%;color:var(--w)}
+.pill.solid{background-color:var(--k);color:var(--w);background-image:linear-gradient(var(--w),var(--w))}
+.pill.solid:hover{color:var(--k)}
+.hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:2rem 1rem;align-items:center;padding:clamp(2rem,6vw,4.5rem) 0 clamp(3rem,6vw,5rem)}
+.hero h1{font-size:clamp(2rem,4.9vw,4.4rem);font-weight:800}
+.stage{min-width:0}
+#three-mount{position:relative;aspect-ratio:1/.95;cursor:grab;touch-action:pan-y;opacity:0;filter:blur(14px);animation:in 1.5s 1.9s cubic-bezier(.2,.7,.2,1) both}
+#three-mount:active{cursor:grabbing}
+#three-mount canvas{display:block;width:100%!important;height:100%!important}
+.rig{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-top:.8rem;opacity:0;animation:fade 1s 3.2s forwards}
+button.pill{cursor:pointer;color:inherit;background-color:transparent}
+.pill.sm{padding:.75em 1.2em;font-size:.66rem}
+.pill.on{background-size:100% 100%;color:var(--w)}
+.hero p{max-width:34rem;margin:2.2rem 0}
+.hero .go-fade{opacity:0;animation:fade 1s 2.6s forwards}
+@keyframes fade{to{opacity:1}}
+.btns{display:flex;gap:1rem;flex-wrap:wrap}
+.marq{overflow:hidden;border-block:1.5px solid var(--k);padding:1.1rem 0;white-space:nowrap}
+.marq div{display:inline-flex;gap:3rem;animation:slide 28s linear infinite;padding-right:3rem}
+.marq span{font:800 clamp(1.6rem,4vw,3rem) var(--d);letter-spacing:-.04em;color:transparent;-webkit-text-stroke:1.5px var(--k);transition:color .3s}
+.marq span:hover{color:var(--k)}
+@keyframes slide{to{transform:translateX(-50%)}}
+
+/* statement */
+.statement{padding:clamp(5rem,12vw,10rem) 0;font:500 clamp(1.25rem,3.3vw,2.7rem)/1.25 var(--d);letter-spacing:-.04em}
+.statement span{color:var(--g);transition:color .5s}
+.statement span.on{color:var(--k)}
+
+/* stats */
+.stats{background:var(--k);color:var(--w);padding:clamp(4rem,9vw,7rem) 0}
+.stats .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:3rem 2rem}
+.stats b{display:block;font:800 clamp(3.2rem,8vw,6.2rem)/1 var(--d);letter-spacing:-.06em}
+.stats b small{font:500 .3em var(--d);letter-spacing:0;margin:0 .1em 0 .3em}
+.stats p{margin-top:.6rem;font-style:italic;opacity:.75}
+
+/* services */
+.sec{padding:clamp(4rem,9vw,7rem) 0}
+h2{font-size:clamp(1.7rem,4.4vw,3.6rem);margin-bottom:clamp(2rem,5vw,3.5rem);max-width:16ch}
+.row{position:relative;display:grid;grid-template-columns:1fr auto;gap:.4rem 2rem;align-items:baseline;padding:1.8rem 0;border-top:1.5px solid var(--k);isolation:isolate;transition:color .4s,padding .4s}
+.row:last-child{border-bottom:1.5px solid var(--k)}
+.row::before{content:'';position:absolute;inset:0 -100vw;background:var(--k);transform:scaleY(0);transform-origin:bottom;transition:transform .5s cubic-bezier(.2,.7,.2,1);z-index:-1}
+.row:hover{color:var(--w);padding-left:1.2rem}
+.row:hover::before{transform:scaleY(1)}
+.row h3{font:500 clamp(1.05rem,2.5vw,1.8rem) var(--d);letter-spacing:-.04em}
+.row em{font-size:1.1rem;white-space:nowrap}
+.row p{grid-column:1;max-width:32rem;opacity:.75}
+
+/* gallery */
+.gal{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.4rem}
+.gal figure:nth-child(even){margin-top:3rem}
+.frame{aspect-ratio:3/4;position:relative;overflow:hidden;transition:transform .35s cubic-bezier(.2,.7,.2,1);will-change:transform}
+.frame::after{content:'';position:absolute;inset:0;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence baseFrequency='.85' numOctaves='2'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");mix-blend-mode:overlay;opacity:.5}
+.f1{background:radial-gradient(circle at 35% 38%,#fff 0,#bbb 16%,#222 55%,#000)}
+.f2{background:conic-gradient(from 200deg at 60% 55%,#000,#777,#fff,#333,#000)}
+.f3{background:radial-gradient(circle at 50% 100%,#fff 0 32%,transparent 33%),linear-gradient(#aaa,#111)}
+.f4{background:linear-gradient(125deg,#f2f2f2,#555 58%,#000)}
+figcaption{margin-top:.8rem;font-style:italic}
+
+/* quote + cta */
+blockquote{font:500 italic clamp(1.8rem,4.4vw,3.4rem)/1.15 var(--s);max-width:26ch}
+cite{display:block;margin-top:1.4rem;font:500 .8rem var(--d);font-style:normal}
+.cta{text-align:center;padding:clamp(5rem,11vw,9rem) 0;border-top:1.5px solid var(--k)}
+.cta h2{max-width:none;margin-inline:auto}
+footer{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding:1.6rem 0 2.4rem;font-size:1rem}
+@media(max-width:860px){.hero{grid-template-columns:1fr}}
+@media(max-width:700px){nav ul{display:none}.gal figure:nth-child(even){margin-top:0}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-delay:0s!important;transition:none!important}.iris,.lens{display:none!important}}
+</style>
+</head>
+<body>
+<div class="iris"></div><div class="lens"></div>
+
+<header class="wrap">
+  <nav>
+    <a class="logo" href="#top">Lumina</a>
+    <ul><li><a href="#work">Работы</a></li><li><a href="#services">Услуги</a></li><li><a href="#contact">Контакты</a></li></ul>
+    <a class="pill" href="#contact">Записаться на съёмку</a>
+  </nav>
+  <section class="hero" id="top">
+    <div class="copy"><h1 data-split data-hero>Снимаем моменты, которые остаются навсегда</h1>
+    <div class="go-fade">
+      <p>Lumina — фотостудия, где снимают портреты, свадьбы и бренды. Мы работаем с естественным светом, не торопимся ради точного кадра и обрабатываем каждое фото вручную.</p>
+      <div class="btns"><a class="pill solid" href="#contact">Записаться на съёмку</a><a class="pill" href="#work">Смотреть работы</a></div>
+    </div></div>
+    <div class="stage">
+      <div id="three-mount" role="img" aria-label="Интерактивная 3D-модель среднеформатной камеры. Потяните, чтобы повернуть."></div>
+      <div class="rig"><button class="pill sm on" data-rig="hero">Спереди</button><button class="pill sm" data-rig="lens">Объектив</button><button class="pill sm" data-rig="top">Сверху</button><button class="pill sm" data-explode>Разобрать объектив</button><button class="pill sm" data-flash>Вспышка</button></div>
+    </div>
+  </section>
+</header>
+
+<div class="marq" aria-hidden="true"><div>
+  <span>Портреты</span><span>Свадьбы</span><span>Семьи</span><span>Бренды</span><span>Предметная съёмка</span><span>Ретушь</span>
+  <span>Портреты</span><span>Свадьбы</span><span>Семьи</span><span>Бренды</span><span>Предметная съёмка</span><span>Ретушь</span>
+</div></div>
+
+<section class="wrap">
+  <p class="statement">Мы не просто делаем снимки. Мы сохраняем свет дня, который вы захотите помнить, и спустя годы возвращаем его вам таким, каким вы его почувствовали.</p>
+</section>
+
+<section class="stats">
+  <div class="wrap grid">
+    <div><b data-n="100">0<span>+</span></b><p>Завершённых проектов</p></div>
+    <div><b data-n="15">0<small>тыс.</small>+</b><p>Обработанных фото</p></div>
+    <div><b data-n="8">0<small>лет</small></b><p>За объективом</p></div>
+    <div><b data-n="98">0<span>%</span></b><p>Клиентов возвращаются снова</p></div>
+  </div>
+</section>
+
+<section class="sec wrap" id="services">
+  <h2 data-split>Что мы снимаем</h2>
+  <div>
+    <a class="row" href="#contact"><h3>Портретные съёмки</h3><em>от 6 000 ₽</em><p>Искренние, живые портреты в нашей студии с дневным светом. Помощь с образом и позированием входит в стоимость.</p></a>
+    <a class="row" href="#contact"><h3>Свадьбы и мероприятия</h3><em>от 60 000 ₽</em><p>Съёмка на весь день и галерея из 400+ обработанных фото в течение трёх недель.</p></a>
+    <a class="row" href="#contact"><h3>Бренд и предметная съёмка</h3><em>от 25 000 ₽</em><p>Чистые, цельные кадры для магазинов, студий и личных брендов.</p></a>
+    <a class="row" href="#contact"><h3>Ретушь</h3><em>от 500 ₽ за фото</em><p>Работа с цветом, кожей и деталями, после которой вы остаётесь собой.</p></a>
+  </div>
+</section>
+
+<section class="sec wrap" id="work">
+  <h2 data-split>Кадры, которыми мы гордимся</h2>
+  <div class="gal">
+    <figure><div class="frame f1"></div><figcaption>Студийный портрет, свет из окна</figcaption></figure>
+    <figure><div class="frame f2"></div><figcaption>Свадьба в золотой час</figcaption></figure>
+    <figure><div class="frame f3"></div><figcaption>Предмет на камне</figcaption></figure>
+    <figure><div class="frame f4"></div><figcaption>Семейная съёмка, осень</figcaption></figure>
+  </div>
+</section>
+
+<section class="sec wrap">
+  <blockquote>«Lumina поймала, как смеётся моя бабушка. Я не знала, что мне нужна эта фотография, пока не взяла её в руки.»</blockquote>
+  <cite>Анна К., клиентка портретной съёмки</cite>
+</section>
+
+<section class="cta" id="contact">
+  <div class="wrap">
+    <h2 data-split>Ваша история — в хорошем свете</h2>
+    <p style="margin-bottom:2rem">Расскажите о своём дне или проекте. Мы ответим в течение 24 часов.</p>
+    <a class="pill solid" href="mailto:hello@lumina.studio">Записаться на съёмку</a>
+  </div>
+</section>
+
+<footer class="wrap"><span>© 2026 Фотостудия Lumina</span><span>Работаем со вторника по воскресенье, 10:00–19:00</span><span>Свет — единственное, что нельзя отретушировать.</span></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const $=s=>document.querySelectorAll(s);
+$('[data-split]').forEach(el=>{let i=0,b=el.hasAttribute('data-hero')?1.5:0;
+  el.innerHTML=el.textContent.trim().split(' ').map(w=>'<span class="w">'+[...w].map(c=>'<span class="c" style="--d:'+(b+i++*.04)+'s">'+c+'</span>').join('')+'</span>').join(' ');
+  if(b)el.classList.add('go')});
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;io.unobserve(e.target);const t=e.target;
+  if(t.dataset.n){const n=+t.dataset.n,t0=performance.now();(function f(t1){const p=Math.min((t1-t0)/1800,1);t.firstChild.textContent=Math.round(n*(1-Math.pow(1-p,4)));p<1&&requestAnimationFrame(f)})(t0)}
+  else t.classList.add('go')}),{threshold:.3});
+$('[data-n],[data-split]:not([data-hero])').forEach(e=>io.observe(e));
+const ir=$('.iris')[0];ir.addEventListener('animationend',()=>ir.remove());
+
+const st=$('.statement')[0];
+st.innerHTML=st.textContent.trim().split(' ').map(w=>'<span>'+w+'</span>').join(' ');
+const ws=[...st.children],sc=()=>{const r=st.getBoundingClientRect(),h=innerHeight,p=Math.min(Math.max((h*.85-r.top)/(r.height+h*.3),0),1);ws.forEach((w,i)=>w.classList.toggle('on',i<p*ws.length*1.1))};
+addEventListener('scroll',sc,{passive:true});sc();
+
+$('.frame').forEach(f=>{f.onmousemove=e=>{const r=f.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;f.style.transform='perspective(800px) rotateY('+x*18+'deg) rotateX('+-y*18+'deg) scale(1.04)'};f.onmouseleave=()=>f.style.transform=''});
+
+if(matchMedia('(pointer:fine)').matches){const l=$('.lens')[0];let x=0,y=0,a=0,b=0;
+  addEventListener('mousemove',e=>{x=e.clientX;y=e.clientY;l.style.opacity=1});
+  (function f(){a+=(x-a)*.16;b+=(y-b)*.16;l.style.transform='translate('+a+'px,'+b+'px)';requestAnimationFrame(f)})();
+  $('a,.frame').forEach(e=>{e.onmouseenter=()=>l.style.setProperty('--s',1.9);e.onmouseleave=()=>l.style.setProperty('--s',1)})}
+        let scene, camera, renderer, rigRoot, keyLight, rimLight, fillLight;
+        let focusRingMesh, apertureRingMesh;
+        let lensElements = []; // { mesh, baseZ, explodeOffset }
+        let isLensExploded = false;
+        let rimAccentOn = true;
+
+        let targetRotX = 0.12, targetRotY = -0.44;
+        let currentRotX = 0.12, currentRotY = -0.44;
+        let targetZoomZ = 6.0, currentZoomZ = 6.0;
+        let dragging = false, lastX = 0, lastY = 0;
+
+        function initThreeCameraStage() {
+            const mount = document.getElementById('three-mount');
+            if (!mount) return;
+
+            scene = new THREE.Scene();
+
+            const w = mount.clientWidth || 640;
+            const h = mount.clientHeight || 340;
+            camera = new THREE.PerspectiveCamera(35, w / h, 0.1, 100);
+            camera.position.set(0, 0.18, currentZoomZ);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(w, h);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.12;
+            mount.appendChild(renderer.domElement);
+
+            // Studio Three-Point Lighting
+            const ambient = new THREE.AmbientLight(0xffffff, 0.8);
+            scene.add(ambient);
+
+            keyLight = new THREE.DirectionalLight(0xfffaf2, 1.55);
+            keyLight.position.set(4.5, 6.0, 5.2);
+            scene.add(keyLight);
+
+            rimLight = new THREE.DirectionalLight(0xf2f2f2, 0.95);
+            rimLight.position.set(-5.0, 3.0, -3.5);
+            scene.add(rimLight);
+
+            fillLight = new THREE.DirectionalLight(0xeef6ff, 0.75);
+            fillLight.position.set(-3.5, -2.0, 4.0);
+            scene.add(fillLight);
+
+            // Root Group
+            rigRoot = new THREE.Group();
+
+            // Procedural Leatherette Bump Texture
+            const leatherCanvas = document.createElement('canvas');
+            leatherCanvas.width = 128;
+            leatherCanvas.height = 128;
+            const lCtx = leatherCanvas.getContext('2d');
+            lCtx.fillStyle = '#18191c';
+            lCtx.fillRect(0, 0, 128, 128);
+            for (let y = 0; y < 128; y += 2) {
+                for (let x = 0; x < 128; x += 2) {
+                    const v = 20 + Math.floor(Math.random() * 18);
+                    lCtx.fillStyle = `rgb(${v},${v},${v + 2})`;
+                    lCtx.fillRect(x, y, 2, 2);
+                }
+            }
+            const leatherTex = new THREE.CanvasTexture(leatherCanvas);
+            leatherTex.wrapS = THREE.RepeatWrapping;
+            leatherTex.wrapT = THREE.RepeatWrapping;
+            leatherTex.repeat.set(4, 3);
+
+            // Materials
+            const titaniumMat = new THREE.MeshStandardMaterial({
+                color: 0xd8dbe0,
+                roughness: 0.24,
+                metalness: 0.86
+            });
+            const anodizedDarkMat = new THREE.MeshStandardMaterial({
+                color: 0x1e2024,
+                roughness: 0.36,
+                metalness: 0.68
+            });
+            const leatheretteMat = new THREE.MeshStandardMaterial({
+                color: 0x18191c,
+                roughness: 0.72,
+                metalness: 0.12,
+                bumpMap: leatherTex,
+                bumpScale: 0.015
+            });
+            const emeraldMetalMat = new THREE.MeshStandardMaterial({
+                color: 0xf2f2f2,
+                roughness: 0.28,
+                metalness: 0.4,
+                emissive: 0x333333,
+                emissiveIntensity: 0.22
+            });
+            const antiReflectiveGlassMat = new THREE.MeshPhysicalMaterial({
+                color: 0x0a0a0a,
+                roughness: 0.04,
+                metalness: 0.1,
+                transmission: 0.72,
+                transparent: true,
+                opacity: 0.9,
+                ior: 1.58,
+                reflectivity: 0.98
+            });
+
+            // 1. Medium-Format Camera Body Core (Leatherette Clad)
+            const bodyCore = new THREE.Mesh(new THREE.BoxGeometry(2.25, 1.44, 1.12), leatheretteMat);
+            rigRoot.add(bodyCore);
+
+            // 2. Brushed Titanium Top & Bottom Plates
+            const topDeck = new THREE.Mesh(new THREE.BoxGeometry(2.30, 0.30, 1.16), titaniumMat);
+            topDeck.position.y = 0.78;
+            rigRoot.add(topDeck);
+
+            const baseDeck = new THREE.Mesh(new THREE.BoxGeometry(2.30, 0.14, 1.16), titaniumMat);
+            baseDeck.position.y = -0.76;
+            rigRoot.add(baseDeck);
+
+            // 3. Ergonomic Right-Hand Grip
+            const gripCyl = new THREE.Mesh(new THREE.CylinderGeometry(0.30, 0.30, 1.42, 28), leatheretteMat);
+            gripCyl.position.set(0.98, 0, 0.40);
+            rigRoot.add(gripCyl);
+
+            // 4. Top Viewfinder Prism & Optical Window
+            const prismHousing = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.34, 0.88), titaniumMat);
+            prismHousing.position.set(-0.08, 1.04, -0.04);
+            rigRoot.add(prismHousing);
+
+            const prismGlass = new THREE.Mesh(
+                new THREE.BoxGeometry(0.44, 0.20, 0.06),
+                new THREE.MeshStandardMaterial({ color: 0x090a0c, roughness: 0.08, metalness: 0.92 })
+            );
+            prismGlass.position.set(-0.08, 1.04, 0.41);
+            rigRoot.add(prismGlass);
+
+            // 5. Machined Dials & Emerald Shutter Release
+            const shutterDial = new THREE.Mesh(new THREE.CylinderGeometry(0.21, 0.21, 0.15, 32), titaniumMat);
+            shutterDial.position.set(0.62, 0.99, -0.08);
+            rigRoot.add(shutterDial);
+
+            const isoDial = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.14, 32), anodizedDarkMat);
+            isoDial.position.set(-0.74, 0.98, -0.06);
+            rigRoot.add(isoDial);
+
+            const shutterCollar = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.16, 0.11, 24), titaniumMat);
+            shutterCollar.position.set(0.94, 0.97, 0.24);
+            rigRoot.add(shutterCollar);
+
+            const shutterButton = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.085, 0.15, 24), emeraldMetalMat);
+            shutterButton.position.set(0.94, 1.01, 0.24);
+            rigRoot.add(shutterButton);
+
+            // 6. Multi-Element 80mm f/1.9 Prime Lens Assembly (Supports Exploded View!)
+            const lensAssembly = new THREE.Group();
+            lensAssembly.position.set(-0.06, -0.04, 0.58);
+
+            // Bayonet Mount Flange
+            const mountFlange = new THREE.Mesh(new THREE.CylinderGeometry(0.67, 0.71, 0.18, 44), titaniumMat);
+            mountFlange.rotation.x = Math.PI / 2;
+            mountFlange.position.z = 0.09;
+            lensAssembly.add(mountFlange);
+
+            // Rear Optical Element (Explodes forward slightly)
+            const rearGlass = new THREE.Mesh(new THREE.CylinderGeometry(0.48, 0.48, 0.08, 36), antiReflectiveGlassMat);
+            rearGlass.rotation.x = Math.PI / 2;
+            rearGlass.position.z = 0.24;
+            lensAssembly.add(rearGlass);
+            lensElements.push({ mesh: rearGlass, baseZ: 0.24, explodeOffset: 0.28 });
+
+            // Main Anodized Barrel
+            const mainBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.63, 0.63, 0.72, 44), anodizedDarkMat);
+            mainBarrel.rotation.x = Math.PI / 2;
+            mainBarrel.position.z = 0.46;
+            lensAssembly.add(mainBarrel);
+            lensElements.push({ mesh: mainBarrel, baseZ: 0.46, explodeOffset: 0.42 });
+
+            // Rotating Brushed Titanium Focus Ring
+            focusRingMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.655, 0.655, 0.24, 44), titaniumMat);
+            focusRingMesh.rotation.x = Math.PI / 2;
+            focusRingMesh.position.z = 0.52;
+            lensAssembly.add(focusRingMesh);
+            lensElements.push({ mesh: focusRingMesh, baseZ: 0.52, explodeOffset: 0.68 });
+
+            // Aperture Ring with Emerald Index Marker
+            apertureRingMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.648, 0.648, 0.14, 44), anodizedDarkMat);
+            apertureRingMesh.rotation.x = Math.PI / 2;
+            apertureRingMesh.position.z = 0.28;
+            lensAssembly.add(apertureRingMesh);
+            lensElements.push({ mesh: apertureRingMesh, baseZ: 0.28, explodeOffset: 0.18 });
+
+            // Middle Aspherical Glass Group
+            const midGlass = new THREE.Mesh(new THREE.CylinderGeometry(0.52, 0.52, 0.09, 36), antiReflectiveGlassMat);
+            midGlass.rotation.x = Math.PI / 2;
+            midGlass.position.z = 0.64;
+            lensAssembly.add(midGlass);
+            lensElements.push({ mesh: midGlass, baseZ: 0.64, explodeOffset: 0.98 });
+
+            // Iridescent Emerald/Cyan Optical Coating Ring
+            const coatingHalo = new THREE.Mesh(
+                new THREE.TorusGeometry(0.45, 0.014, 14, 40),
+                new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55 })
+            );
+            coatingHalo.position.z = 0.80;
+            lensAssembly.add(coatingHalo);
+            lensElements.push({ mesh: coatingHalo, baseZ: 0.80, explodeOffset: 1.24 });
+
+            // Front Convex Objective Lens + Hood Ring
+            const frontGlass = new THREE.Mesh(
+                new THREE.SphereGeometry(0.55, 36, 24, 0, Math.PI * 2, 0, Math.PI * 0.34),
+                antiReflectiveGlassMat
+            );
+            frontGlass.rotation.x = Math.PI / 2;
+            frontGlass.position.z = 0.42;
+            lensAssembly.add(frontGlass);
+            lensElements.push({ mesh: frontGlass, baseZ: 0.42, explodeOffset: 1.38 });
+
+            const frontHoodRing = new THREE.Mesh(new THREE.TorusGeometry(0.61, 0.04, 16, 44), anodizedDarkMat);
+            frontHoodRing.position.z = 0.86;
+            lensAssembly.add(frontHoodRing);
+            lensElements.push({ mesh: frontHoodRing, baseZ: 0.86, explodeOffset: 1.62 });
+
+            rigRoot.add(lensAssembly);
+
+            // 7. Subtle Floating Studio Softbox & Reflector Geometry Accents
+            const softboxFrame = new THREE.Mesh(
+                new THREE.BoxGeometry(0.28, 0.42, 0.05),
+                new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2, metalness: 0.05 })
+            );
+            softboxFrame.position.set(-1.95, 0.48, -0.35);
+            softboxFrame.rotation.set(0.18, 0.48, -0.14);
+            rigRoot.add(softboxFrame);
+
+            const reflectorDisc = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.22, 0.22, 0.03, 32),
+                titaniumMat
+            );
+            reflectorDisc.position.set(1.92, -0.44, -0.22);
+            reflectorDisc.rotation.set(0.35, -0.45, 0.25);
+            rigRoot.add(reflectorDisc);
+
+            // 8. Soft Studio Floor Contact Shadow
+            const shadowCanvas = document.createElement('canvas');
+            shadowCanvas.width = 256;
+            shadowCanvas.height = 256;
+            const sCtx = shadowCanvas.getContext('2d');
+            const grad = sCtx.createRadialGradient(128, 128, 12, 128, 128, 120);
+            grad.addColorStop(0, 'rgba(0,0,0,0.3)');
+            grad.addColorStop(0.55, 'rgba(0,0,0,0.1)');
+            grad.addColorStop(1, 'rgba(20, 21, 24, 0)');
+            sCtx.fillStyle = grad;
+            sCtx.fillRect(0, 0, 256, 256);
+
+            const shadowMesh = new THREE.Mesh(
+                new THREE.PlaneGeometry(4.5, 2.5),
+                new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(shadowCanvas), transparent: true, depthWrite: false })
+            );
+            shadowMesh.rotation.x = -Math.PI / 2;
+            shadowMesh.position.y = -1.28;
+            scene.add(shadowMesh);
+
+
+            // Lumina additions: grip ridges, aperture index, engraved plate
+            for (let i = 0; i < 40; i++) {
+                const a = i / 40 * Math.PI * 2;
+                const ridge = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.2, 0.05), anodizedDarkMat);
+                ridge.position.set(Math.cos(a) * 0.665, 0, Math.sin(a) * 0.665);
+                ridge.rotation.y = -a;
+                focusRingMesh.add(ridge);
+            }
+            const idx = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.1, 0.04), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+            idx.position.set(0, 0, 0.66);
+            apertureRingMesh.add(idx);
+            const pc = document.createElement('canvas'); pc.width = 512; pc.height = 96;
+            const px = pc.getContext('2d'); px.fillStyle = '#111'; px.font = '700 52px Arial, sans-serif';
+            px.textAlign = 'center'; px.textBaseline = 'middle'; if ('letterSpacing' in px) px.letterSpacing = '14px';
+            px.fillText('LUMINA', 256, 50);
+            const plate = new THREE.Mesh(new THREE.PlaneGeometry(0.86, 0.16), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(pc), transparent: true }));
+            plate.position.set(-0.6, 0.78, 0.585);
+            rigRoot.add(plate);
+            scene.add(rigRoot);
+
+            // Pointer Drag Orbit Controls
+            const startDrag = (x, y) => { dragging = true; lastX = x; lastY = y; };
+            const moveDrag = (x, y) => {
+                if (!dragging) return;
+                targetRotY += (x - lastX) * 0.0085;
+                targetRotX = Math.max(-0.65, Math.min(0.75, targetRotX + (y - lastY) * 0.0065));
+                lastX = x;
+                lastY = y;
+            };
+            const endDrag = () => { dragging = false; };
+
+            mount.addEventListener('mousedown', (e) => startDrag(e.clientX, e.clientY));
+            window.addEventListener('mousemove', (e) => moveDrag(e.clientX, e.clientY));
+            window.addEventListener('mouseup', endDrag);
+
+            mount.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) startDrag(e.touches[0].clientX, e.touches[0].clientY);
+            }, { passive: true });
+            mount.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 1) moveDrag(e.touches[0].clientX, e.touches[0].clientY);
+            }, { passive: true });
+            mount.addEventListener('touchend', endDrag);
+
+            window.addEventListener('resize', () => {
+                if (!mount) return;
+                const nw = mount.clientWidth;
+                const nh = mount.clientHeight;
+                camera.aspect = nw / nh;
+                camera.updateProjectionMatrix();
+                renderer.setSize(nw, nh);
+            });
+
+            // 60fps Animation Loop
+            const clock = new THREE.Clock();
+            function renderLoop() {
+                requestAnimationFrame(renderLoop);
+                const t = clock.getElapsedTime();
+
+                if (!dragging) {
+                    targetRotY += Math.sin(t * 0.55) * 0.0011;
+                }
+
+                // Idle studio levitation & smooth focus ring breathing
+                rigRoot.position.y = Math.sin(t * 1.55) * 0.065;
+                focusRingMesh.rotation.y = Math.sin(t * 0.85) * 0.7;
+                apertureRingMesh.rotation.y = -Math.sin(t * 0.85) * 0.45;
+
+                // Smooth damping for Exploded Lens Elements
+                lensElements.forEach((item) => {
+                    const goalZ = item.baseZ + (isLensExploded ? item.explodeOffset : 0);
+                    item.mesh.position.z += (goalZ - item.mesh.position.z) * 0.09;
+                });
+
+                currentRotX += (targetRotX - currentRotX) * 0.085;
+                currentRotY += (targetRotY - currentRotY) * 0.085;
+                currentZoomZ += (targetZoomZ - currentZoomZ) * 0.085;
+
+                rigRoot.rotation.x = currentRotX;
+                rigRoot.rotation.y = currentRotY + (window.scrollY || 0) * 0.0018;
+                camera.position.z = currentZoomZ;
+
+                if (window.scrollY < innerHeight * 1.5) renderer.render(scene, camera);
+            }
+            renderLoop();
+        }
+
+
+function rig(p){const P={hero:[.12,-.44,6],lens:[.05,-.78,5.35],top:[.66,-.28,5.65]}[p];targetRotX=P[0];targetRotY=P[1];targetZoomZ=P[2];$('[data-rig]').forEach(b=>b.classList.toggle('on',b.dataset.rig===p))}
+function explode(b){isLensExploded=!isLensExploded;b.classList.toggle('on',isLensExploded);if(isLensExploded){targetRotY=-.78;targetRotX=.08}}
+function flash(){if(!keyLight)return;const f=document.createElement('div');f.style.cssText='position:fixed;inset:0;background:#fff;mix-blend-mode:difference;z-index:70;pointer-events:none;transition:opacity .6s';document.body.appendChild(f);requestAnimationFrame(()=>f.style.opacity=0);setTimeout(()=>f.remove(),650);keyLight.intensity=5;const k=setInterval(()=>{keyLight.intensity-=.4;if(keyLight.intensity<=1.55){keyLight.intensity=1.55;clearInterval(k)}},28)}
+$('[data-rig]').forEach(b=>b.onclick=()=>rig(b.dataset.rig));
+$('[data-explode]')[0].onclick=e=>explode(e.currentTarget);
+$('[data-flash]')[0].onclick=flash;
+try{if(!window.THREE)throw 0;initThreeCameraStage()}catch(e){$('.stage')[0].style.display='none'}
+</script>
+</body>
+</html>
